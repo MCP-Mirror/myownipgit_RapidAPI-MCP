@@ -7,7 +7,7 @@ This repository contains an implementation of an MCP Server for interfacing with
 - RapidAPI Global Patent API integration
 - MCP Server implementation for handling patent requests
 - SQLite database integration for patent data storage
-- Custom patent scoring system
+- Advanced patent scoring system (pscore, cscore, lscore, tscore)
 - Rate limiting and error handling
 
 ## Installation
@@ -25,7 +25,8 @@ pip install -r requirements.txt
 
 3. Set up environment variables:
 ```bash
-export RAPIDAPI_KEY="your_api_key"
+cp .env.example .env
+# Edit .env with your settings
 ```
 
 ## Usage
@@ -58,13 +59,40 @@ results = await mcp_server.handle_patent_request(search_request)
   - `client.py` - RapidAPI client implementation
   - `server.py` - MCP Server implementation
   - `database.py` - SQLite database operations
-  - `utils.py` - Utility functions and helpers
+  - `scoring.py` - Patent scoring system
+  - `__init__.py` - Package initialization
+- `docs/` - Documentation
+  - `SCORING.md` - Detailed scoring methodology
+- `examples/` - Example scripts
+- `tests/` - Unit tests
+
+## Scoring System
+
+The system implements a comprehensive patent scoring methodology:
+
+- Patent Score (pscore): Overall patent strength
+- Citation Score (cscore): Citation impact analysis
+- Legal Score (lscore): Legal status evaluation
+- Technology Score (tscore): Technical complexity assessment
+
+See [SCORING.md](docs/SCORING.md) for detailed information.
 
 ## Configuration
 
 The server uses the following environment variables:
 - `RAPIDAPI_KEY`: Your RapidAPI API key
 - `DB_PATH`: Path to SQLite database (optional, defaults to `./patents.db`)
+- Additional configuration options in `.env`
+
+## Rate Limits
+
+The RapidAPI service has the following limits:
+- 1000 requests per day
+- 500000 hard limit
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
