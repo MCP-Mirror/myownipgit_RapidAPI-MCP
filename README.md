@@ -12,15 +12,34 @@ This repository contains an implementation of an MCP Server for interfacing with
 
 ## Installation
 
+### Using Conda (Recommended)
+
 1. Clone the repository:
 ```bash
 git clone https://github.com/myownipgit/RapidAPI-MCP.git
 cd RapidAPI-MCP
 ```
 
-2. Install required dependencies:
+2. Create and activate conda environment:
 ```bash
-pip install -r requirements.txt
+# Create environment from yml file
+conda env create -f environment.yml
+
+# Activate environment
+conda activate rapidapi-mcp
+```
+
+Alternatively, you can create the environment manually:
+```bash
+# Create new environment with Python 3.11
+conda create -n rapidapi-mcp python=3.11
+
+# Activate environment
+conda activate rapidapi-mcp
+
+# Install required packages
+conda install -c conda-forge requests aiohttp python-dotenv pytest
+pip install rapidapi-connect
 ```
 
 3. Set up environment variables:
@@ -53,6 +72,17 @@ search_request = {
 results = await mcp_server.handle_patent_request(search_request)
 ```
 
+## Testing
+
+To run the tests, activate your conda environment and run:
+```bash
+# Run the connection test
+python tests/test_connection.py
+
+# Run all tests with pytest
+python -m pytest tests/
+```
+
 ## Project Structure
 
 - `patent_mcp/` - Main package directory
@@ -65,6 +95,11 @@ results = await mcp_server.handle_patent_request(search_request)
   - `SCORING.md` - Detailed scoring methodology
 - `examples/` - Example scripts
 - `tests/` - Unit tests
+
+## Requirements
+
+- Python 3.11 or higher
+- Required packages are listed in `environment.yml`
 
 ## Scoring System
 
