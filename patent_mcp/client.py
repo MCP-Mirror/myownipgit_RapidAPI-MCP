@@ -19,9 +19,18 @@ class PatentAPIClient:
                 "q": {
                     "_and": [
                         {
-                            "_text_all": {
-                                "patent_title": query_params['searchText'].split()
-                            }
+                            "_or": [
+                                {
+                                    "_text_all": {
+                                        "patent_title": query_params['searchText'].split()
+                                    }
+                                },
+                                {
+                                    "_text_all": {
+                                        "patent_abstract": query_params['searchText'].split()
+                                    }
+                                }
+                            ]
                         },
                         {
                             "_gte": {
@@ -35,11 +44,22 @@ class PatentAPIClient:
                         }
                     ]
                 },
-                "f": ["patent_number", "patent_title", "patent_date", 
-                      "patent_type", "patent_abstract", "assignee_organization"],
+                "f": [
+                    "patent_number", 
+                    "patent_title", 
+                    "patent_date", 
+                    "patent_type", 
+                    "patent_abstract",
+                    "assignee_organization",
+                    "patent_processing_time",
+                    "patent_kind",
+                    "inventors",
+                    "cpc_codes"
+                ],
                 "o": {
                     "page": query_params['pageNumber'], 
-                    "per_page": query_params['pageSize']
+                    "per_page": query_params['pageSize'],
+                    "sort": ["patent_date desc"]
                 }
             }
             
@@ -55,7 +75,8 @@ class PatentAPIClient:
             
             # Print response status and headers for debugging
             print(f"Response status: {response.status_code}")
-            print(f"Response headers: {response.headers}")
+            if response.status_code != 200:
+                print(f"Response text: {response.text}")
             
             response.raise_for_status()
             result = response.json()
@@ -68,7 +89,11 @@ class PatentAPIClient:
                     'date': patent.get('patent_date'),
                     'type': patent.get('patent_type'),
                     'abstract': patent.get('patent_abstract'),
-                    'assignee': patent.get('assignee_organization')
+                    'assignee': patent.get('assignee_organization'),
+                    'processingTime': patent.get('patent_processing_time'),
+                    'kind': patent.get('patent_kind'),
+                    'inventors': patent.get('inventors'),
+                    'cpcCodes': patent.get('cpc_codes')
                 } for patent in result.get('patents', [])]
             }
             
