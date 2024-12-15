@@ -18,7 +18,8 @@ async def test_api_connection():
         results = client.search_patents(test_query)
         if results and results.get('patents'):
             print('✅ Connection successful!')
-            print(f'Found {len(results["patents"])} patents')
+            print(f'Total patents found: {results.get("total_patent_count", 0)}')
+            print(f'Showing {len(results["patents"])} results from page {test_query["pageNumber"]}')
             print('\nSample results:')
             for patent in results['patents']:
                 print(f'\n{"="*80}')
@@ -27,9 +28,12 @@ async def test_api_connection():
                 print(f'Date: {patent.get("date")}')
                 print(f'Type: {patent.get("type")}')
                 print(f'Kind: {patent.get("kind")}')
-                print(f'Assignee: {patent.get("assignee")}')
-                print(f'Inventor: {patent.get("inventor")}')
-                print(f'CPC Group: {patent.get("cpcGroup")}')
+                print(f'Assignee: {patent.get("assignee", "Not specified")}')
+                if patent.get('inventor'):
+                    print(f'Inventor: {patent.get("inventor")}')
+                if patent.get('cpcGroup'):
+                    print(f'CPC Classification: {patent.get("cpcGroup")}')
+                    print(f'CPC Section: {patent.get("cpcSection")} - {patent.get("cpcSubsection")}')
                 if patent.get('abstract'):
                     print(f'Abstract: {patent.get("abstract")[:200]}...')
         else:
