@@ -13,17 +13,20 @@ async def test_api_connection():
         'pageNumber': 1
     }
     
-    print('\nTesting USPTO API connection...')
+    print('\nTesting PatentsView API connection...')
     try:
         results = client.search_patents(test_query)
-        if results:
+        if results and results.get('patents'):
             print('✅ Connection successful!')
-            print(f'Found {len(results.get("patents", []))} patents')
+            print(f'Found {len(results["patents"])} patents')
             print('\nSample result:')
-            if results.get('patents'):
-                patent = results['patents'][0]
-                print(f'Title: {patent.get("title")}')
-                print(f'Document Number: {patent.get("patentNumber")}')
+            patent = results['patents'][0]
+            print(f'Title: {patent.get("title")}')
+            print(f'Patent Number: {patent.get("patentNumber")}')
+            print(f'Date: {patent.get("date")}')
+            print(f'Assignee: {patent.get("assignee")}')
+            if patent.get('abstract'):
+                print(f'Abstract: {patent.get("abstract")[:200]}...')
         else:
             print('❌ No results returned')
     except Exception as e:
