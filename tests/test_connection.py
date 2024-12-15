@@ -28,12 +28,10 @@ async def test_api_connection():
                 print(f'Type: {patent.get("type")}')
                 print(f'Kind: {patent.get("kind")}')
                 print(f'Assignee: {patent.get("assignee")}')
+                print(f'Inventor: {patent.get("inventor")}')
+                print(f'CPC Group: {patent.get("cpcGroup")}')
                 if patent.get('abstract'):
                     print(f'Abstract: {patent.get("abstract")[:200]}...')
-                if patent.get('cpcCodes'):
-                    print(f'CPC Codes: {patent.get("cpcCodes")}')
-                if patent.get('inventors'):
-                    print(f'Inventors: {patent.get("inventors")}')
         else:
             print('❌ No results returned')
     except Exception as e:
