@@ -4,17 +4,21 @@ from patent_mcp.client import PatentAPIClient
 def format_assignee(assignee):
     if not assignee.get('organization'):
         return 'Not specified'
-    return f"{assignee['organization']} ({assignee.get('country', 'Unknown')}, {assignee.get('type', 'Unknown type')})"
+    location = assignee.get('location', {})
+    location_str = f"{location.get('city', '')}, {location.get('state', '')}, {location.get('country', '')}".strip(', ')
+    return f"{assignee['organization']} ({location_str}) [{assignee.get('type', 'Unknown type')}]"
 
 def format_inventor(inventor):
     if not inventor.get('name'):
         return 'Not specified'
-    return f"{inventor['name']} ({inventor.get('organization', 'Unknown org')}, {inventor.get('country', 'Unknown country')})"
+    location = inventor.get('location', {})
+    location_str = f"{location.get('city', '')}, {location.get('state', '')}, {location.get('country', '')}".strip(', ')
+    return f"{inventor['name']} ({location_str})"
 
 def format_cpc(cpc):
     if not cpc.get('section'):
         return 'Not specified'
-    return f"{cpc['section']}/{cpc.get('subsection', '')} - {cpc.get('group', '')}/{cpc.get('subgroup', '')} ({cpc.get('category', 'Unknown category')})"
+    return f"{cpc['section']}/{cpc.get('subsection', '')} - {cpc.get('group', '')}/{cpc.get('subgroup', '')} (Sequence: {cpc.get('sequence', 'Unknown')})"
 
 async def test_api_connection():
     client = PatentAPIClient()
@@ -52,12 +56,12 @@ async def test_api_connection():
                 if patent.get('abstract'):
                     print(f'\nAbstract: {patent["abstract"][:200]}...')
                 
-                if patent.get('citedBy'):
-                    print(f'\nCited by {len(patent["citedBy"])} patents:')
-                    for citation in patent['citedBy'][:3]:  # Show first 3 citations
+                if patent.get('citations'):
+                    print(f'\nCitations ({len(patent["citations"])} patents):')
+                    for citation in patent['citations'][:3]:  # Show first 3 citations
                         print(f"  - {citation['patentNumber']}: {citation['title']} ({citation['date']})")
-                    if len(patent['citedBy']) > 3:
-                        print(f"  ... and {len(patent['citedBy']) - 3} more")
+                    if len(patent['citations']) > 3:
+                        print(f"  ... and {len(patent['citations']) - 3} more")
                 
                 print(f'\nProcessing Time: {patent.get("processingTime", "Not specified")} days')
         else:
