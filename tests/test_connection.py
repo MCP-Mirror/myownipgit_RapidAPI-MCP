@@ -19,14 +19,21 @@ async def test_api_connection():
         if results and results.get('patents'):
             print('✅ Connection successful!')
             print(f'Found {len(results["patents"])} patents')
-            print('\nSample result:')
-            patent = results['patents'][0]
-            print(f'Title: {patent.get("title")}')
-            print(f'Patent Number: {patent.get("patentNumber")}')
-            print(f'Date: {patent.get("date")}')
-            print(f'Assignee: {patent.get("assignee")}')
-            if patent.get('abstract'):
-                print(f'Abstract: {patent.get("abstract")[:200]}...')
+            print('\nSample results:')
+            for patent in results['patents']:
+                print(f'\n{"="*80}')
+                print(f'Title: {patent.get("title")}')
+                print(f'Patent Number: {patent.get("patentNumber")}')
+                print(f'Date: {patent.get("date")}')
+                print(f'Type: {patent.get("type")}')
+                print(f'Kind: {patent.get("kind")}')
+                print(f'Assignee: {patent.get("assignee")}')
+                if patent.get('abstract'):
+                    print(f'Abstract: {patent.get("abstract")[:200]}...')
+                if patent.get('cpcCodes'):
+                    print(f'CPC Codes: {patent.get("cpcCodes")}')
+                if patent.get('inventors'):
+                    print(f'Inventors: {patent.get("inventors")}')
         else:
             print('❌ No results returned')
     except Exception as e:
