@@ -53,8 +53,10 @@ class PatentAPIClient:
                     "assignee_organization",
                     "patent_processing_time",
                     "patent_kind",
-                    "inventors",
-                    "cpc_codes"
+                    "inventor_last_name",
+                    "inventor_first_name",
+                    "cpc_group_id",
+                    "cpc_group_title"
                 ],
                 "o": {
                     "page": query_params['pageNumber'], 
@@ -92,8 +94,8 @@ class PatentAPIClient:
                     'assignee': patent.get('assignee_organization'),
                     'processingTime': patent.get('patent_processing_time'),
                     'kind': patent.get('patent_kind'),
-                    'inventors': patent.get('inventors'),
-                    'cpcCodes': patent.get('cpc_codes')
+                    'inventor': f"{patent.get('inventor_first_name', '')} {patent.get('inventor_last_name', '')}".strip(),
+                    'cpcGroup': f"{patent.get('cpc_group_id', '')} - {patent.get('cpc_group_title', '')}"
                 } for patent in result.get('patents', [])]
             }
             
