@@ -34,9 +34,10 @@ class PatentAPIClient:
                                         },
                                         {
                                             "_or": [
-                                                {"cpc_group_id": "G06N-010"}, # Quantum computing
-                                                {"cpc_group_id": "G06N-99"}, # Subject matter not provided for in other groups
-                                                {"cpc_group_id": "H01L-039"} # Superconducting devices
+                                                {"cpc_subgroup_id": "G06N10"}, # Quantum computing
+                                                {"cpc_subgroup_id": "G06N99"}, # Computing arrangements
+                                                {"cpc_subgroup_id": "H01L39"}, # Superconducting devices
+                                                {"cpc_subgroup_id": "G06N7"} # Probabilistic computing
                                             ]
                                         }
                                     ]
@@ -56,20 +57,38 @@ class PatentAPIClient:
                     ]
                 },
                 "f": [
+                    # Basic patent information
                     "patent_number", 
                     "patent_title", 
                     "patent_date", 
                     "patent_type", 
                     "patent_abstract",
-                    "assignee_organization",
-                    "patent_processing_time",
                     "patent_kind",
+                    "patent_processing_time",
+                    
+                    # Assignee information
+                    "assignee_organization_harmonized",
+                    "assignee_country",
+                    "assignee_state",
+                    "assignee_type",
+                    
+                    # Inventor information
                     "inventor_last_name",
                     "inventor_first_name",
-                    "cpc_group_id",
-                    "cpc_group_title",
+                    "inventor_organization",
+                    "inventor_country",
+                    
+                    # CPC classification
                     "cpc_section_id",
-                    "cpc_subsection_id"
+                    "cpc_subsection_id",
+                    "cpc_group_id",
+                    "cpc_subgroup_id",
+                    "cpc_category",
+                    
+                    # Citation information
+                    "citedby_patent_number",
+                    "citedby_patent_title",
+                    "citedby_patent_date"
                 ],
                 "o": {
                     "page": query_params['pageNumber'], 
@@ -104,14 +123,46 @@ class PatentAPIClient:
                     'title': patent.get('patent_title'),
                     'date': patent.get('patent_date'),
                     'type': patent.get('patent_type'),
-                    'abstract': patent.get('patent_abstract'),
-                    'assignee': patent.get('assignee_organization'),
-                    'processingTime': patent.get('patent_processing_time'),
                     'kind': patent.get('patent_kind'),
-                    'inventor': f"{patent.get('inventor_first_name', '')} {patent.get('inventor_last_name', '')}".strip(),
-                    'cpcGroup': f"{patent.get('cpc_group_id', '')} - {patent.get('cpc_group_title', '')}",
-                    'cpcSection': patent.get('cpc_section_id', ''),
-                    'cpcSubsection': patent.get('cpc_subsection_id', '')
+                    'abstract': patent.get('patent_abstract'),
+                    'processingTime': patent.get('patent_processing_time'),
+                    
+                    # Assignee details
+                    'assignee': {
+                        'organization': patent.get('assignee_organization_harmonized'),
+                        'country': patent.get('assignee_country'),
+                        'state': patent.get('assignee_state'),
+                        'type': patent.get('assignee_type')
+                    },
+                    
+                    # Inventor details
+                    'inventor': {
+                        'name': f"{patent.get('inventor_first_name', '')} {patent.get('inventor_last_name', '')}".strip(),
+                        'organization': patent.get('inventor_organization'),
+                        'country': patent.get('inventor_country')
+                    },
+                    
+                    # CPC Classification
+                    'cpc': {
+                        'section': patent.get('cpc_section_id'),
+                        'subsection': patent.get('cpc_subsection_id'),
+                        'group': patent.get('cpc_group_id'),
+                        'subgroup': patent.get('cpc_subgroup_id'),
+                        'category': patent.get('cpc_category')
+                    },
+                    
+                    # Citation information
+                    'citedBy': [
+                        {
+                            'patentNumber': cite_num,
+                            'title': cite_title,
+                            'date': cite_date
+                        } for cite_num, cite_title, cite_date in zip(
+                            patent.get('citedby_patent_number', []),
+                            patent.get('citedby_patent_title', []),
+                            patent.get('citedby_patent_date', [])
+                        )
+                    ] if patent.get('citedby_patent_number') else []
                 } for patent in result.get('patents', [])]
             }
             
