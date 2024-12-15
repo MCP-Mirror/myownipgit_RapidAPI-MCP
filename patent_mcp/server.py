@@ -1,11 +1,11 @@
-from .client import RapidAPIPatentClient
+from .client import PatentAPIClient
 from .database import PatentDatabase
 from typing import Dict, Any
 import asyncio
 
 class MCPPatentServer:
     def __init__(self):
-        self.api_client = RapidAPIPatentClient()
+        self.api_client = PatentAPIClient()
         self.db = PatentDatabase()
         
     async def handle_patent_request(self, request_data: Dict[str, Any]) -> Dict:
@@ -36,16 +36,16 @@ class MCPPatentServer:
         formatted_data = []
         for result in api_results.get('patents', []):
             formatted_record = {
-                'document_no': result.get('publication_number'),
+                'document_no': result.get('patentNumber'),
                 'title': result.get('title'),
-                'country_code': result.get('country_code'),
+                'country_code': result.get('countryCode', 'US'),
                 'current_assignee': result.get('assignee'),
                 'document_status': result.get('status'),
-                'application_status': result.get('app_status'),
-                'cpc_first': result.get('cpc_main'),
-                'cpc_inventive': result.get('cpc_further'),
-                'file_date': result.get('filing_date'),
-                'grant_date': result.get('grant_date'),
+                'application_status': result.get('appStatus'),
+                'cpc_first': result.get('cpcMain'),
+                'cpc_inventive': result.get('cpcFurther'),
+                'file_date': result.get('filingDate'),
+                'grant_date': result.get('grantDate'),
                 'pscore': 0,
                 'cscore': 0,
                 'lscore': 0,
