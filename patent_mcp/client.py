@@ -67,15 +67,19 @@ class PatentAPIClient:
                     "patent_processing_time",
                     
                     # Assignee information
-                    "assignee_organization_harmonized",
-                    "assignee_country",
-                    "assignee_state",
+                    "assignee_id",
+                    "assignee_organization",
                     "assignee_type",
+                    "assignee_city",
+                    "assignee_state",
+                    "assignee_country",
                     
                     # Inventor information
-                    "inventor_last_name",
+                    "inventor_id",
                     "inventor_first_name",
-                    "inventor_organization",
+                    "inventor_last_name",
+                    "inventor_city",
+                    "inventor_state",
                     "inventor_country",
                     
                     # CPC classification
@@ -83,12 +87,12 @@ class PatentAPIClient:
                     "cpc_subsection_id",
                     "cpc_group_id",
                     "cpc_subgroup_id",
-                    "cpc_category",
+                    "cpc_sequence",
                     
                     # Citation information
-                    "citedby_patent_number",
-                    "citedby_patent_title",
-                    "citedby_patent_date"
+                    "cited_patent_number",
+                    "cited_patent_title",
+                    "cited_patent_date"
                 ],
                 "o": {
                     "page": query_params['pageNumber'], 
@@ -129,17 +133,25 @@ class PatentAPIClient:
                     
                     # Assignee details
                     'assignee': {
-                        'organization': patent.get('assignee_organization_harmonized'),
-                        'country': patent.get('assignee_country'),
-                        'state': patent.get('assignee_state'),
-                        'type': patent.get('assignee_type')
+                        'id': patent.get('assignee_id'),
+                        'organization': patent.get('assignee_organization'),
+                        'type': patent.get('assignee_type'),
+                        'location': {
+                            'city': patent.get('assignee_city'),
+                            'state': patent.get('assignee_state'),
+                            'country': patent.get('assignee_country')
+                        }
                     },
                     
                     # Inventor details
                     'inventor': {
+                        'id': patent.get('inventor_id'),
                         'name': f"{patent.get('inventor_first_name', '')} {patent.get('inventor_last_name', '')}".strip(),
-                        'organization': patent.get('inventor_organization'),
-                        'country': patent.get('inventor_country')
+                        'location': {
+                            'city': patent.get('inventor_city'),
+                            'state': patent.get('inventor_state'),
+                            'country': patent.get('inventor_country')
+                        }
                     },
                     
                     # CPC Classification
@@ -148,21 +160,19 @@ class PatentAPIClient:
                         'subsection': patent.get('cpc_subsection_id'),
                         'group': patent.get('cpc_group_id'),
                         'subgroup': patent.get('cpc_subgroup_id'),
-                        'category': patent.get('cpc_category')
+                        'sequence': patent.get('cpc_sequence')
                     },
                     
                     # Citation information
-                    'citedBy': [
-                        {
-                            'patentNumber': cite_num,
-                            'title': cite_title,
-                            'date': cite_date
-                        } for cite_num, cite_title, cite_date in zip(
-                            patent.get('citedby_patent_number', []),
-                            patent.get('citedby_patent_title', []),
-                            patent.get('citedby_patent_date', [])
-                        )
-                    ] if patent.get('citedby_patent_number') else []
+                    'citations': [{
+                        'patentNumber': num,
+                        'title': title,
+                        'date': date
+                    } for num, title, date in zip(
+                        patent.get('cited_patent_number', []),
+                        patent.get('cited_patent_title', []),
+                        patent.get('cited_patent_date', [])
+                    )] if patent.get('cited_patent_number') else []
                 } for patent in result.get('patents', [])]
             }
             
