@@ -17,14 +17,30 @@ class PatentAPIClient:
             # Convert query params to PatentsView format
             search_criteria = {
                 "q": {
-                    "_text_any": {"patent_title": query_params['searchText']},
-                    "_gte": {"patent_date": query_params['start']},
-                    "_lte": {"patent_date": query_params['end']}
+                    "_and": [
+                        {
+                            "_text_all": {
+                                "patent_title": query_params['searchText'].split()
+                            }
+                        },
+                        {
+                            "_gte": {
+                                "patent_date": query_params['start']
+                            }
+                        },
+                        {
+                            "_lte": {
+                                "patent_date": query_params['end']
+                            }
+                        }
+                    ]
                 },
                 "f": ["patent_number", "patent_title", "patent_date", 
                       "patent_type", "patent_abstract", "assignee_organization"],
-                "o": {"page": query_params['pageNumber'], 
-                      "per_page": query_params['pageSize']}
+                "o": {
+                    "page": query_params['pageNumber'], 
+                    "per_page": query_params['pageSize']
+                }
             }
             
             # Print request details for debugging
@@ -33,7 +49,8 @@ class PatentAPIClient:
             
             response = requests.post(
                 f"{self.base_url}/query",
-                json=search_criteria
+                json=search_criteria,
+                headers={'Content-Type': 'application/json'}
             )
             
             # Print response status and headers for debugging
@@ -73,7 +90,8 @@ class PatentAPIClient:
             
             response = requests.post(
                 f"{self.base_url}/query",
-                json=search_criteria
+                json=search_criteria,
+                headers={'Content-Type': 'application/json'}
             )
             response.raise_for_status()
             return response.json()
